@@ -4,9 +4,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-RELEASE=$1
-SETUP_AUTOPKGTEST_QEMU=$2
-
 setup_autopkgtest() {
     echo "Setting up autopkgtest..."
 

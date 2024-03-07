@@ -5,7 +5,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 setup_sbuild() {
-    echo "Setting up sbuild..."
+    echo "Setting up sbuild (release: $RELEASE)..."
 
     RELEASE=$1
 

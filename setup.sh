@@ -30,6 +30,10 @@ function print_usage
     echo    "Run $0 --help to show this usage information."
 }
 
+function print_error() {
+    echo "ERROR:" "$@" 1>&2;
+}
+
 # Parse parameters:
 while [ "$#" -gt "0" ]; do
     case $1 in
@@ -49,6 +53,7 @@ while [ "$#" -gt "0" ]; do
             ;;
         --setup-qemu-autopkgtest)
             SETUP_AUTOPKGTEST_QEMU=true
+            shift 1
             ;;
         *)
             print_error "unexpected argument '$1'"
@@ -58,10 +63,6 @@ while [ "$#" -gt "0" ]; do
     esac
 done
 
-function print_err() {
-    echo "ERROR:" "$@" 1>&2;
-}
-
 # shellcheck disable=SC1091
 source ./scripts/configure-sbuild.sh
 # shellcheck disable=SC1091
@@ -69,8 +70,10 @@ source ./scripts/configure-autopkgtest.sh
 # shellcheck disable=SC1091
 source ./scripts/configure-lxd.sh
 
+echo "$RELEASE"
+
 if [ -z "$RELEASE" ]; then
-    print_err "Specify a release with --devel-release"
+    print_error "Specify a release with --devel-release"
     exit 1
 fi
 
