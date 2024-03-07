@@ -5,6 +5,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 RELEASE='' # The current ubuntu devel release to setup a schroot for (--devel-release)
+SETUP_AUTOPKGTEST_QEMU=false # Should setup QEMU + Autopkgtest QEMU image (--setup-qemu-autopkgtest)
 
 function print_usage
 {
@@ -13,13 +14,15 @@ function print_usage
     reset_style='\033[0m'
 
     echo    ""
-    echo -e "${bold_style}Usage:${reset_style} $0 --devel-release ${underline_style}release${reset_style}"
+    echo -e "${bold_style}Usage:${reset_style} $0 --devel-release ${underline_style}release${reset_style} [ --setup-qemu-autopkgtest ]"
     echo    ""
     echo    "Sets up an Ubuntu development environment."
     echo    ""
     echo    "Parameter:"
     echo -e "  --devel-release ${underline_style}release${reset_style}"
-    echo -e "        ${underline_style}release${reset_style} is used to determine the current devel release to setup the schroot for"
+    echo -e "        ${underline_style}release${reset_style} is used to determine the current devel release to setup the schroot for."
+    echo    "  --setup-qemu-autopkgtest"
+    echo -e "        Switch on QEMU installation and autopkgtest QEMU image creation. Default: false."
     echo    ""
     echo    "Example:"
     echo    "  $0 --devel-release noble"
@@ -44,6 +47,9 @@ while [ "$#" -gt "0" ]; do
             RELEASE=$2
             shift 2
             ;;
+        --setup-qemu-autopkgtest)
+            SETUP_AUTOPKGTEST_QEMU=true
+            ;;
         *)
             print_error "unexpected argument '$1'"
             print_usage
@@ -60,6 +66,8 @@ function print_err() {
 source ./scripts/configure-sbuild.sh
 # shellcheck disable=SC1091
 source ./scripts/configure-autopkgtest.sh
+# shellcheck disable=SC1091
+source ./scripts/configure-lxd.sh
 
 if [ -z "$RELEASE" ]; then
     print_err "Specify a release with --devel-release"
@@ -70,4 +78,7 @@ fi
 setup_sbuild "$RELEASE"
 
 # 2: setup autopkgtest
-setup_autopkgtest
+setup_autopkgtest "$RELEASE" $SETUP_AUTOPKGTEST_QEMU
+
+# 3: setup lxd
+setup_lxd
