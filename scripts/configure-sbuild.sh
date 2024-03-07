@@ -40,7 +40,7 @@ setup_sbuild() {
 \$maintainer_name='Mateus Rodrigues de Morais <mateus.morais@canonical.com>';
 
 # Default distribution to build.
-\$distribution = \"$RELEASE\";
+\$distribution = "$RELEASE";
 # Build arch-all by default.
 \$build_arch_all = 1;
 
