@@ -70,8 +70,6 @@ source ./scripts/configure-autopkgtest.sh
 # shellcheck disable=SC1091
 source ./scripts/configure-lxd.sh
 
-echo "$RELEASE"
-
 if [ -z "$RELEASE" ]; then
     print_error "Specify a release with --devel-release"
     exit 1

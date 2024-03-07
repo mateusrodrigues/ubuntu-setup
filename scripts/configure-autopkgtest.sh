@@ -15,9 +15,9 @@ setup_autopkgtest() {
 
     # build images
     if $SETUP_AUTOPKGTEST_QEMU; then
-        sudo apt-get install qemu-system-"$(dpkg --print-architecture)"
+        sudo apt-get install -y qemu-system-"$(dpkg --print-architecture)"
 
-        popd "$HOME"/testbeds
+        pushd "$HOME"/testbeds
         autopkgtest-buildvm-ubuntu-cloud -r "$RELEASE" -v
         popd
     fi

@@ -11,7 +11,7 @@ setup_sbuild() {
 
     # install required packages
     sudo apt-get update
-    sudo apt-get install -y sbuild debhelper ubuntu-dev-tools piuparts
+    sudo apt-get install -y sbuild debhelper ubuntu-dev-tools
 
     # setup user
     sudo adduser "$USER" sbuild
