@@ -10,7 +10,8 @@ setup_autopkgtest() {
     # create testbeds directory
     mkdir -p "$HOME"/testbeds
 
-    sudo apt-get install autopkgtest
+    sudo apt-get update
+    sudo apt-get install -y autopkgtest
 
     # build images
 }

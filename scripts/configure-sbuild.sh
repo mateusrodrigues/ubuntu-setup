@@ -8,7 +8,8 @@ setup_sbuild() {
     echo "Setting up sbuild..."
 
     # install required packages
-    sudo apt-get install sbuild debhelper ubuntu-dev-tools piuparts
+    sudo apt-get update
+    sudo apt-get install -y sbuild debhelper ubuntu-dev-tools piuparts
 
     # setup user
     adduser "$USER" sbuild
@@ -19,11 +20,19 @@ setup_sbuild() {
     mkdir -p "$HOME"/ubuntu/build
 
     # setup mountpoints inside schroot
-    echo "$HOME/ubuntu/scratch    /scratch    none    rw,bind    0    0" | sudo tee -a /etc/schroot/sbuild/fstab
-    echo "$HOME                   $HOME       none    rw,bind    0    0" | sudo tee -a /etc/schroot/sbuild/fstab
+    if ! grep -q "$HOME" /etc/schroot/sbuild/fstab; then
+        echo "$HOME                   $HOME       none    rw,bind    0    0" | sudo tee -a /etc/schroot/sbuild/fstab
+    fi
+    if ! grep -q "$HOME"/ubuntu/build /etc/schroot/sbuild/fstab; then
+        echo "$HOME/ubuntu/build      /build      none    rw,bind    0    0" | sudo tee -a /etc/schroot/sbuild/fstab
+    fi
+    if ! grep -q "$HOME"/ubuntu/scratch /etc/schroot/sbuild/fstab; then
+        echo "$HOME/ubuntu/scratch    /scratch    none    rw,bind    0    0" | sudo tee -a /etc/schroot/sbuild/fstab
+    fi
 
     # create .sbuildrc in home directory
-    cat >"$HOME"/.sbuildrc <<EOT
+    if [ ! -f "$HOME"/.sbuildrc ]; then
+        tee "$HOME"/.sbuildrc <<EOT
 # Name to use as override in .changes files for the Maintainer: field
 # (mandatory, no default!).
 $maintainer_name='Mateus Rodrigues de Morais <mateus.morais@canonical.com>';
@@ -51,9 +60,11 @@ $log_dir=$ENV{HOME}."/ubuntu/logs";
 # don't remove this, Perl needs it:
 1;
 EOT
+    fi
 
     # create .mk-sbuild.rc in home directory
-    cat >"$HOME"/.mk-sbuild.rc <<EOT
+    if [ ! -f "$HOME"/.mk-sbuild.rc ]; then
+        tee "$HOME"/.mk-sbuild.rc <<EOT
 SCHROOT_CONF_SUFFIX="source-root-users=root,sbuild,admin
 source-root-groups=root,sbuild,admin
 preserve-environment=true"
@@ -65,8 +76,11 @@ SKIP_PROPOSED="1"
 # if you have e.g. apt-cacher-ng around
 # DEBOOTSTRAP_PROXY=http://127.0.0.1:3142/
 EOT
+    fi
 
     # create schroot for release
-    sg sbuild
-    mk-sbuild noble
+    if ! schroot -l | grep noble-"$(dpkg --print-architecture)"; then
+        sg sbuild
+        mk-sbuild noble
+    fi
 }
