@@ -12,7 +12,7 @@ setup_sbuild() {
     sudo apt-get install -y sbuild debhelper ubuntu-dev-tools piuparts
 
     # setup user
-    adduser "$USER" sbuild
+    sudo adduser "$USER" sbuild
 
     # create required directories
     mkdir -p "$HOME"/ubuntu/scratch
@@ -32,7 +32,7 @@ setup_sbuild() {
 
     # create .sbuildrc in home directory
     if [ ! -f "$HOME"/.sbuildrc ]; then
-        tee "$HOME"/.sbuildrc <<EOT
+        tee "$HOME"/.sbuildrc <<"EOT"
 # Name to use as override in .changes files for the Maintainer: field
 # (mandatory, no default!).
 $maintainer_name='Mateus Rodrigues de Morais <mateus.morais@canonical.com>';
@@ -64,7 +64,7 @@ EOT
 
     # create .mk-sbuild.rc in home directory
     if [ ! -f "$HOME"/.mk-sbuild.rc ]; then
-        tee "$HOME"/.mk-sbuild.rc <<EOT
+        tee "$HOME"/.mk-sbuild.rc <<"EOT"
 SCHROOT_CONF_SUFFIX="source-root-users=root,sbuild,admin
 source-root-groups=root,sbuild,admin
 preserve-environment=true"
