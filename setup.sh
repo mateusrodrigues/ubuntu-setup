@@ -52,10 +52,19 @@ while [ "$#" -gt "0" ]; do
     esac
 done
 
+function print_err() {
+    echo "ERROR:" "$@" 1>&2;
+}
+
 # shellcheck disable=SC1091
 source ./scripts/configure-sbuild.sh
 # shellcheck disable=SC1091
 source ./scripts/configure-autopkgtest.sh
+
+if [ -z "$RELEASE" ]; then
+    print_err "Specify a release with --devel-release"
+    exit 1
+fi
 
 # 1: setup sbuild
 setup_sbuild "$RELEASE"
