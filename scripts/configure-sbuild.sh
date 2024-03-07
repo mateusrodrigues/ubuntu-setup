@@ -7,6 +7,8 @@ IFS=$'\n\t'
 setup_sbuild() {
     echo "Setting up sbuild..."
 
+    RELEASE=$1
+
     # install required packages
     sudo apt-get update
     sudo apt-get install -y sbuild debhelper ubuntu-dev-tools piuparts
@@ -32,30 +34,30 @@ setup_sbuild() {
 
     # create .sbuildrc in home directory
     if [ ! -f "$HOME"/.sbuildrc ]; then
-        tee "$HOME"/.sbuildrc <<"EOT"
+        tee "$HOME"/.sbuildrc <<EOT
 # Name to use as override in .changes files for the Maintainer: field
 # (mandatory, no default!).
-$maintainer_name='Mateus Rodrigues de Morais <mateus.morais@canonical.com>';
+\$maintainer_name='Mateus Rodrigues de Morais <mateus.morais@canonical.com>';
 
 # Default distribution to build.
-$distribution = "noble";
+\$distribution = \"$RELEASE\";
 # Build arch-all by default.
-$build_arch_all = 1;
+\$build_arch_all = 1;
 
 # When to purge the build directory afterwards; possible values are "never",
 # "successful", and "always".  "always" is the default. It can be helpful
 # to preserve failing builds for debugging purposes.  Switch these comments
 # if you want to preserve even successful builds, and then use
 # "schroot -e --all-sessions" to clean them up manually.
-$purge_build_directory = 'successful';
-$purge_session = 'successful';
-$purge_build_deps = 'successful';
-# $purge_build_directory = 'never';
-# $purge_session = 'never';
-# $purge_build_deps = 'never';
+\$purge_build_directory = 'successful';
+\$purge_session = 'successful';
+\$purge_build_deps = 'successful';
+# \$purge_build_directory = 'never';
+# \$purge_session = 'never';
+# \$purge_build_deps = 'never';
 
 # Directory for writing build logs to
-$log_dir=$ENV{HOME}."/ubuntu/logs";
+\$log_dir=\$ENV{HOME}."/ubuntu/logs";
 
 # don't remove this, Perl needs it:
 1;
@@ -79,8 +81,7 @@ EOT
     fi
 
     # create schroot for release
-    if ! schroot -l | grep noble-"$(dpkg --print-architecture)"; then
-        sg sbuild
-        mk-sbuild noble
+    if ! schroot -l 2> /dev/null | grep noble-"$(dpkg --print-architecture)"; then
+        sg - sbuild -c "mk-sbuild noble"
     fi
 }
